@@ -633,7 +633,7 @@ void inst_processrxtimeout(instance_data_t *inst)
 {
 
 	//inst->responseTimeouts ++ ;
-    inst->rxTimeouts ++ ;
+    inst->rxTimeouts++ ;
     inst->done = INST_NOT_DONE_YET;
 
 	if((inst->newReportSent) && (inst->newReportSent < MAX_NUMBER_OF_REPORT_RETRYS)) //no ACK send another report

@@ -320,148 +320,57 @@ int main(void)
 
     Sleep(1000); //wait for LCD to power on
 
-    init_dw();
+    //init_dw();
+
     //initLCD();
-
-    //memset(dataseq, 40, 0);
-    //memcpy(dataseq, (const uint8 *) "      KFRL      ", 16);
-    //writetoLCD( 40, 1, dataseq); //send some data
-    //memcpy(dataseq, (const uint8 *) "Vehicle Yaseen  ", 16); // Also set at line #26 (Should make this from single value !!!)
-    //writetoLCD( 16, 1, dataseq); //send some data
-
-    //Sleep(1000);
 
 
     port_DisableEXT_IRQ(); //disable ScenSor IRQ until we configure the device
 
-    //test EVB1000 - used in EVK1000 production
-    //NOTE: when using non-Discovery mode switch 8 is part of address config/anchor poll mask config
-//#if (DR_DISCOVERY == 1)
-//    if((is_button_low(0) == S1_SWITCH_ON) && (is_switch_on(TA_SW1_8) == S1_SWITCH_ON)) //using BOOT1 switch for test
-//    {
-//        //test_application_run(); //does not return....
-//    }
-//    //else
-//#endif
-
     //this 'if' is for pc software, i am commenting this bcz we dont need to run deca ranging on PC
-    if(false/*is_switch_on(TA_SW1_3) == S1_SWITCH_OFF*/)
+    if(false)
     {
-    	/*
-        int j = 1000000;
-        uint8 command;
 
-        memset(dataseq, 0, 40);
-
-        while(j--);
-        //command = 0x1 ;  //clear screen
-        //writetoLCD( 1, 0,  &command);
-        command = 0x2 ;  //return cursor home
-        writetoLCD( 1, 0,  &command);
-
-        memcpy(dataseq, (const uint8 *) "      KFRL", 10);
-        writetoLCD( 40, 1, dataseq); //send some data
-
-        writetoLCD( 16, 1, dataseq); //send some data
-
-        j = 1000000;
-
-        while(j--);
-
-        command = 0x2 ;  //return cursor home
-        writetoLCD( 1, 0,  &command);
-
-        return 1;*/
     }
     else //run DecaRanging application.. this is what we actually need.
     {
-        /*uint8 dataseq[40];
-        uint8 command = 0x0;
-
-        command = 0x2 ;  //return cursor home
-        writetoLCD( 1, 0,  &command);
-        memset(dataseq, ' ', 40);
-        memcpy(dataseq, (const uint8 *) "      KFRL     ", 15);
-        writetoLCD( 15, 1, dataseq); //send some data
-		*/
-
-        led_off(LED_ALL);
+       led_off(LED_ALL);
 
         if(inittestapplication() == (uint32)-1) //test SPI and dw1000 device is working or not
         {
             led_on(LED_ALL); 			//to display error....
-
-            /*dataseq[0] = 0x2 ;  		//return cursor home
-            writetoLCD( 1, 0,  &dataseq[0]);
-            memset(dataseq, ' ', 40);
-            memcpy(dataseq, (const uint8 *) "ERROR   ", 12);
-            writetoLCD( 40, 1, dataseq); //send some data
-            memcpy(dataseq, (const uint8 *) "  INIT FAIL ", 12);
-            writetoLCD( 40, 1, dataseq); //send some data
-            */
-
             return 0; //error
         }
-        else
+        else  //init test was successfull.. Blink LEDs to indicate
         {
         	i=20;
-        	        	                                         while(i--)
-        	        	                                         {
-        	        	                                             if (i & 1) {
-        	        	                                             	led_off(LED_PC6);
-        	        	                                             	led_on(LED_PC7);
-        	        	                                             	//led_off(LED_PC7);
-        	        	                                             }
-        	        	                                             else{
-        	        	                                             	led_on(LED_PC6);
-        	        	                                             	led_off(LED_PC7);
-        	        	                                             	//led_on(LED_PC7);
-        	        	                                             }
-        	        	                                             Sleep(100);
-        	        	                                         }
+			 while(i--)
+			 {
+				 if (i & 1) {
+					led_off(LED_PC6);
+					led_on(LED_PC7);
+					//led_off(LED_PC7);
+				 }
+				 else{
+					led_on(LED_PC6);
+					led_off(LED_PC7);
+					//led_on(LED_PC7);
+				 }
+				 Sleep(100);
+			 }
 
-        	        	                                         i = 0;
-        	        	                                 led_off(LED_ALL);
+			 i = 0;
+        	 led_off(LED_ALL);
         }
 
-        //sleep for 5 seconds displaying "Decawave"
-//        i=30;
-//        while(i--)
-//        {
-//            if (i & 1) led_off(LED_ALL);
-//            else    led_on(LED_ALL);
-//
-//            Sleep(200);
-//        }
-//        i = 0;
-//        led_off(LED_ALL);
-
-        /*command = 0x2 ;  //return cursor home
-        writetoLCD( 1, 0,  &command);
-
-        memset(dataseq, ' ', 40);
-		*/
-
-#if (DR_DISCOVERY == 1)
-		//led_on(LED_PC6);
-#endif
-
-		/*memcpy(&dataseq[2], (const uint8 *) "  AWAITING  ", 12);
-		writetoLCD( 40, 1, dataseq); //send some data
-		memcpy(&dataseq[2], (const uint8 *) "    POLL    ", 12);
-		writetoLCD( 16, 1, dataseq); //send some data
-
-        command = 0x2 ;  //return cursor home
-        writetoLCD( 1, 0,  &command);*/
     }
+
+    led_off(LED_ALL);
 
     port_EnableEXT_IRQ(); //enable ScenSor IRQ before starting
 
-//    memset(dataseq, ' ', 40);
-//    memset(dataseq1, ' ', 40);
-
     // main loop
-    led_off(LED_ALL);
+
 
     while(1)
     {
@@ -484,10 +393,12 @@ int main(void)
 
             if(range_result < 1.0f){
             	//memcpy(&dataseq1[0], (const uint8 *) "      STOP      ", 16);
-            	led_on(LED_ALL);
+            	led_on(LED_PC6);
+            	led_off(LED_PC7);
             }
             else {
-            	led_off(LED_ALL);
+            	led_on(LED_PC7);
+            	led_off(LED_PC6);
             	//memcpy(&dataseq1[0], (const uint8 *) "       OK       ", 16);
             }
 
