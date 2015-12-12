@@ -30,3 +30,16 @@
 
 # Debug files
 *.dSYM/
+
+#lib documentation
+*.html
+*.html
+*.doc
+
+#Eclipse build files, ignore all
+Debug/*
+
+#Except the build file
+!Debug/anchor_single.hex
+
+*.txt
