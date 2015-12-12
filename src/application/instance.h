@@ -599,11 +599,6 @@ typedef struct
 
 	encryption_data_t encryption_data;
 
-	//state data
-
-	bool notInSM;// = true;
-
-	int rst_loop;
 
 } instance_data_t ;
 

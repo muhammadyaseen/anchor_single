@@ -24,7 +24,6 @@
 	extern void send_usbmessage(uint8*, int);
 #endif*/
 
-	//bool not_in_sm = true;
 
 	int instance_anchaddr = 0; //0 = 0xDECA020000000001; 1 = 0xDECA020000000002; 2 = 0xDECA020000000003
 	//NOTE: switches TA_SW1_7 and TA_SW1_8 are used to set tag/anchor address
@@ -78,7 +77,6 @@ uint32 inittestapplication(void)
         dwt_softreset();
     }
 
-    Sleep(2000); 	//sleep 250ms to give other anchors a chance to pair
     //reset the DW1000 by driving the RSTn line low
     reset_DW1000();
 
@@ -148,7 +146,7 @@ int test_si446x()
 
 	//power up si
 
-	/*GPIO_SetBits(SI_GPIO, SI_SDN);
+	GPIO_SetBits(SI_GPIO, SI_SDN);
 	Sleep(20);
 	GPIO_ResetBits(SI_GPIO, SI_SDN);
 	Sleep(20);
@@ -161,10 +159,13 @@ int test_si446x()
 
 	SI4463_init();
 
-*/
+
 	//read dev id
 
 	//
+
+
+
 
 	return -1;
 }
@@ -303,9 +304,7 @@ void init_dw(void)
 **/
 int main(void)
 {
-
-
-	int i = 0;
+    int i = 0;
     int toggle = 1;
     int ranging = 0;
     uint8 dataseq[40];
@@ -319,9 +318,9 @@ int main(void)
 
     spi_peripheral_init();
 
-    //Sleep(1000); //wait for LCD to power on
+    Sleep(1000); //wait for LCD to power on
 
-    //init_dw();
+    init_dw();
     //initLCD();
 
     //memset(dataseq, 40, 0);
@@ -405,8 +404,8 @@ int main(void)
         }
         else
         {
-        	//i=15;
-        	        	                                         /*while(i--)
+        	i=20;
+        	        	                                         while(i--)
         	        	                                         {
         	        	                                             if (i & 1) {
         	        	                                             	led_off(LED_PC6);
@@ -421,8 +420,8 @@ int main(void)
         	        	                                             Sleep(100);
         	        	                                         }
 
-        	        	                                         i = 0;*/
-        	        	                                 led_on(LED_PC6);
+        	        	                                         i = 0;
+        	        	                                 led_off(LED_ALL);
         }
 
         //sleep for 5 seconds displaying "Decawave"
@@ -461,39 +460,11 @@ int main(void)
 //    memset(dataseq, ' ', 40);
 //    memset(dataseq1, ' ', 40);
 
-    uint8 ranges_done = 0;
-
     // main loop
-
-    led_off(LED_PC7);
-
-    	//TODO: Start Watchdog timer
-
-    	IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-    	IWDG_SetPrescaler(8);
-    	IWDG_Enable();
-
-
-    	//int loop1 = 0;
-    	//not_in_sm = true;
-    	instance_data[0].notInSM = true;
-    	instance_data[0].rst_loop = 0;
+    led_off(LED_ALL);
 
     while(1)
     {
-    	//Sleep(1);
-
-/*    	if ( instance_data[0].notInSM )
-    	{
-    		instance_data[0].rst_loop++;
-    		if ( instance_data[0].rst_loop > 50000) { while(1); }
-    	}*/
-
-
-    	IWDG_ReloadCounter();
-
-    	if ( ++instance_data[0].rst_loop > 100000) { while(1); }
-
         instance_run();
 
         if(instancenewrange())
@@ -513,27 +484,14 @@ int main(void)
 
             if(range_result < 1.0f){
             	//memcpy(&dataseq1[0], (const uint8 *) "      STOP      ", 16);
-            	led_on(LED_PC6);
-            	led_off(LED_PC7);
+            	led_on(LED_ALL);
             }
             else {
-            	led_on(LED_PC7);
-            	led_off(LED_PC6);
+            	led_off(LED_ALL);
             	//memcpy(&dataseq1[0], (const uint8 *) "       OK       ", 16);
             }
 
-            if ( ++ranges_done == 1 )
-            {
 
-            	reset_DW1000();
-
-            	while(1) {
-
-            		IWDG_ReloadCounter();
-
-            	}		// Let IWDT reset the device
-
-            }
 //            writetoLCD( 16, 1, dataseq1); //send some data
 
         }

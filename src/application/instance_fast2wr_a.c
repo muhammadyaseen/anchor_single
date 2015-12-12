@@ -32,8 +32,6 @@ int testapprun_af(instance_data_t *inst, int message)
 {
 	//ychange
 
-	//inst->notInSM = false;
-
 	//static uint8 rndCount = 0;
 
 	//increment counter for random value
@@ -367,10 +365,6 @@ int testapprun_af(instance_data_t *inst, int message)
             {
                 case SIG_RX_BLINK :
                 {
-//                	inst->notInSM = false;
-//                	instance_data[0].rst_loop = 0;
-//                	IWDG_ReloadCounter();
-
                 	event_data_t* dw_event = instance_getevent(1); //get and clear this event
 
 					//add this Tag to the list of Tags we know about
@@ -491,11 +485,6 @@ int testapprun_af(instance_data_t *inst, int message)
                             case RTLS_DEMO_MSG_TAG_POLLF:
                             {
                             	//uint8 temp[5];
-
-/*                            	inst->notInSM = false;
-                            	IWDG_ReloadCounter();
-                            	instance_data[0].rst_loop = 0;*/
-
                             	uint8 late = 0;
                             	inst->delayedReplyTime32 = ((uint32)dw_event->timeStamp32h + (uint32)inst->fixedFastReplyDelay32h) ;
 								//need to write the delayed time before starting transmission
@@ -625,9 +614,7 @@ int testapprun_af(instance_data_t *inst, int message)
                                 reportTOF_f(inst);
 
                                 //this is a new range calculation, indicate it by setting flag.
-
                                 inst->newrange = 1;
-                                //inst->notInSM = true;
 
                                 //led_on(LED_ALL);
 

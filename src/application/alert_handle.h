@@ -5,8 +5,8 @@
  *      Author: KFRL/ Muhammad Yaseen
  */
 
-#ifndef ANCHOR_SINGLE_SRC_APPLICATION_ALERT_HANDLE_H_
-#define ANCHOR_SINGLE_SRC_APPLICATION_ALERT_HANDLE_H_
+#ifndef SRC_APPLICATION_ALERT_HANDLE_H_
+#define SRC_APPLICATION_ALERT_HANDLE_H_
 
 #include "port.h"
 #include "instance.h"
@@ -23,4 +23,4 @@ void should_stop(void);
 
 #endif
 
-/* ANCHOR_SINGLE_SRC_APPLICATION_ALERT_HANDLE_H_ */
+/* SRC_APPLICATION_ALERT_HANDLE_H_ */
