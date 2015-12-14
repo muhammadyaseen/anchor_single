@@ -16,15 +16,6 @@
 
 #include "deca_spi.h"
 
-/*
-#ifdef USB_SUPPORT
-	extern void usb_run(void);
-	extern int usb_init(void);
-	extern void usb_printconfig(void);
-	extern void send_usbmessage(uint8*, int);
-#endif*/
-
-
 	int instance_anchaddr = 0; //0 = 0xDECA020000000001; 1 = 0xDECA020000000002; 2 = 0xDECA020000000003
 	//NOTE: switches TA_SW1_7 and TA_SW1_8 are used to set tag/anchor address
 
@@ -190,105 +181,6 @@ void process_deca_irq(void)
     }while(port_CheckEXT_IRQ() == 1); //while IRS line active (ARM can only do edge sensitive interrupts)
 
 }
-
-void initLCD(void)
-{
-    uint8 initseq[9] = { 0x39, 0x14, 0x55, 0x6D, 0x78, 0x38 /*0x3C*/, 0x0C, 0x01, 0x06 };
-    uint8 command = 0x0;
-    int j = 100000;
-
-    writetoLCD( 9, 0,  initseq); //init seq
-    while(j--);
-
-    command = 0x2 ;  //return cursor home
-    writetoLCD( 1, 0,  &command);
-    command = 0x1 ;  //clear screen
-    writetoLCD( 1, 0,  &command);
-}
-
-/*
- * @brief switch_mask  - bitmask of testing switches (currently 7 switches)
- *        switchbuff[] - switch name to test
- *        *switch_fn[]() - corresponded to switch test function
-**/
-#define switch_mask   (0x7F)
-
-const uint8 switchbuf[]={0, TA_SW1_3 , TA_SW1_4 ,  TA_SW1_8 };
-const int (* switch_fn[])(uint16)={ &is_button_low, \
-                                &is_switch_on, &is_switch_on, &is_switch_on,\
-                                &is_switch_on, &is_switch_on, &is_switch_on };
-
-/*
- * @fn test_application_run
- * @brief   test application for production pre-test procedure
-**/
-void test_application_run(void)
-{
-    char  dataseq[2][40];
-    uint8 j, switchStateOn, switchStateOff;
-
-    switchStateOn=0;
-    switchStateOff=0;
-
-    led_on(LED_ALL);    // show all LED OK
-    Sleep(1000);
-
-    dataseq[0][0] = 0x1 ;  //clear screen
-    writetoLCD( 1, 0, (const uint8 *) &dataseq);
-    dataseq[0][0] = 0x2 ;  //return cursor home
-    writetoLCD( 1, 0, (const uint8 *) &dataseq);
-
-/* testing SPI to DW1000*/
-    writetoLCD( 40, 1, (const uint8 *) "TESTING         ");
-    writetoLCD( 40, 1, (const uint8 *) "SPI, U2, S2, S3 ");
-    Sleep(1000);
-
-    if(inittestapplication() == (uint32)-1)
-    {
-        writetoLCD( 40, 1, (const uint8 *) "SPI, U2, S2, S3 ");
-        writetoLCD( 40, 1, (const uint8 *) "-- TEST FAILS --");
-        while(1); //stop
-    }
-
-    writetoLCD( 40, 1, (const uint8 *) "SPI, U2, S2, S3 ");
-    writetoLCD( 40, 1, (const uint8 *) "    TEST OK     ");
-    Sleep(1000);
-
-/* testing of switch S2 */
-    dataseq[0][0] = 0x1 ;  //clear screen
-    writetoLCD( 1, 0, (const uint8 *) &dataseq);
-
-    while( (switchStateOn & switchStateOff) != switch_mask )
-        {
-        memset(&dataseq, ' ', sizeof(dataseq));
-        strcpy(&dataseq[0][0], (const char *)"SWITCH");
-        strcpy(&dataseq[1][0], (const char *)"toggle");
-//switch 7-1
-        for (j=0;j<sizeof(switchbuf);j++)
-        {
-            if( switch_fn[j](switchbuf[j]) ) //execute current switch switch_fn
-            {
-                dataseq[0][8+j]='O';
-                switchStateOn |= 0x01<<j;
-                switchStateOff &= ~(0x01<<j);//all switches finaly should be in off state
-            }else{
-                dataseq[1][8+j]='O';
-                switchStateOff |=0x01<<j;
-        }
-        }
-
-        writetoLCD(40, 1, (const uint8 *) &dataseq[0][0]);
-        writetoLCD(40, 1, (const uint8 *) &dataseq[1][0]);
-        Sleep(100);
-        }
-
-    led_off(LED_ALL);
-
-    writetoLCD( 40, 1, (const uint8 *) "  Preliminary   ");
-    writetoLCD( 40, 1, (const uint8 *) "   TEST OKAY    ");
-
-    while(1);
-    }
 
 void init_dw(void)
 {

@@ -14,8 +14,8 @@
 #include "port.h"
 #include "deca_device_api.h"
 #include "deca_spi.h"
-
 #include "instance.h"
+#include "encryption.h"
 
 // -------------------------------------------------------------------------------------------------------------------
 

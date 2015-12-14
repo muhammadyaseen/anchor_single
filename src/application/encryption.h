@@ -1,7 +1,7 @@
 #ifndef _ENCRYPTION_H_
 #define _ENCRYPTION_H_
 
-#include "instance.h"
+#include "../platform/data_types.h"
 
 #define KEY_LEN 	4
 
