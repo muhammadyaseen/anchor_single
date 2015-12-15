@@ -210,7 +210,8 @@ int main(void)
 
     spi_peripheral_init();
 
-    Sleep(1000); //wait for LCD to power on
+    Sleep(10);
+    //Sleep(1000); //wait for LCD to power on
 
     //init_dw();
 
