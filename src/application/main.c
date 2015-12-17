@@ -263,14 +263,19 @@ int main(void)
     port_EnableEXT_IRQ(); //enable ScenSor IRQ before starting
 
     // main loop
-
+    IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+    IWDG_SetPrescaler(IWDG_Prescaler_4);
+    IWDG_Enable();
 
     while(1)
     {
+    	IWDG_ReloadCounter();
         instance_run();
 
         if(instancenewrange())
         {
+
+
         	int l = 0, txl = 0, rxl = 0, aaddr, taddr;
             ranging = 1;
             //send the new range information to LCD and/or USB
@@ -295,6 +300,8 @@ int main(void)
             	//memcpy(&dataseq1[0], (const uint8 *) "       OK       ", 16);
             }
 
+            Sleep(250);
+            while(1);
 
 //            writetoLCD( 16, 1, dataseq1); //send some data
 

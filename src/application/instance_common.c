@@ -420,7 +420,6 @@ int instance_init(void)
 
     instance_localdata[instance].testapprun_fn = NULL;
     instance_data[instance].canprintinfo = 0;
-    instance_data[instance].ranges = 0;
     return 0 ;
 }
 
