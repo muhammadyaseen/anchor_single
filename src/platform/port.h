@@ -179,9 +179,10 @@ int NVIC_DisableDECAIRQ(void);
 // vibrator
 #define VIB				GPIO_Pin_8
 #define VIB_GPIO		GPIOA
+
 // buzzer
-#define BUZZ			GPIO_Pin_2
-#define BUZZ_GPIO		GPIOA
+#define BUZZ			GPIO_Pin_14
+#define BUZZ_GPIO		GPIOB
 // alert LED
 #define ALERT_LED		GPIO_Pin_7
 
@@ -217,14 +218,26 @@ void bat_adc_off(void);
 
 ///////////////////////// Start peripherals for Si4463  //////////////////////////////////
 #define SI_SPI 					SPI2
-#define SI_GPIO					GPIOB
-#define SI_CS					GPIO_Pin_12
-#define SI_SCK					GPIO_Pin_13
-#define SI_MISO					GPIO_Pin_14
-#define SI_MOSI					GPIO_Pin_15
-#define SI_SDN					GPIO_Pin_9
+//#define SI_GPIO					GPIOB
+
+#define SHIELD_GPIO					GPIOB
+
+//#define SI_IRQ					GPIO_Pin_11
+//#define SI_CS					GPIO_Pin_12
+//#define SI_SCK					GPIO_Pin_13
+//#define SI_MISO					GPIO_Pin_14
+//#define SI_MOSI					GPIO_Pin_15
+
+#define TX_EN_RED					GPIO_Pin_11
+#define RX_EN_BLK					GPIO_Pin_12
+#define TX_DATA_GRN					GPIO_Pin_13
+#define RX_DATA_YLW					GPIO_Pin_14
+
+//#define SI_MOSI					GPIO_Pin_15
+
 
 #define SI_BautRatePrescaler 	SPI_BaudRatePrescaler_64
+
 
 void SI_IntConfig(void);
 ////////////////////////// END peripherals for Si4463 /////////////////////////////////
@@ -281,6 +294,9 @@ void setup_RoleBtnIRQ(void);
 void role_btn_set(FunctionalState command);
 
 void init_I2C1(void);
+uint16 readADC1(uint8);
+void ADC_Configuration(void);
+int USART_Configuration(void);
 
 #ifdef __cplusplus
 }

@@ -295,10 +295,10 @@ int RCC_Configuration(void)
 	RCC_GetClocksFreq(&RCC_ClockFreq);
 
 	/* Enable SPI1 clock */
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
+	//RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);
 
 	/* Enable SPI2 clock */
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
 
 	/* Enable GPIOs clocks */
 	RCC_APB2PeriphClockCmd(
@@ -310,39 +310,94 @@ int RCC_Configuration(void)
 	return 0;
 }
 
-int USART_Configuration(void)
+/*int USART_Configuration(void)
 {
-#if 0
+
+	//USART_DeInit(USART1);
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
+	USART_Cmd(USART1, ENABLE);
+
 	USART_InitTypeDef USART_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	// USARTx setup
-	USART_InitStructure.USART_BaudRate = 115200;
+	USART_InitStructure.USART_BaudRate = 7578;
 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
 	USART_InitStructure.USART_Parity = USART_Parity_No;
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
 
-	USART_Init(USARTx, &USART_InitStructure);
+	//USART_Init(USARTx, &USART_InitStructure);
+	USART_Init(USART1, &USART_InitStructure);
 
 	// USARTx TX pin setup
-	GPIO_InitStructure.GPIO_Pin = USARTx_TX;
+	//GPIO_InitStructure.GPIO_Pin = USARTx_TX;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 
-	GPIO_Init(USARTx_GPIO, &GPIO_InitStructure);
+	//GPIO_Init(USARTx_GPIO, &GPIO_InitStructure);
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
 	// USARTx RX pin setup
-	GPIO_InitStructure.GPIO_Pin = USARTx_RX;
+//	GPIO_InitStructure.GPIO_Pin = USARTx_RX;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 
-	GPIO_Init(USARTx_GPIO, &GPIO_InitStructure);
+	//GPIO_Init(USARTx_GPIO, &GPIO_InitStructure);
+	GPIO_Init(GPIOA, &GPIO_InitStructure);
 
 	// Enable USARTx
-	USART_Cmd(USARTx, ENABLE);
-#endif
+	//USART_Cmd(USARTx, ENABLE);
+	USART_Cmd(USART1, ENABLE);
+
+    return 0;
+}*/
+
+int USART_Configuration(void)
+{
+
+	USART_DeInit(USART3);
+
+	RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOB | RCC_APB2Periph_AFIO, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
+
+	USART_InitTypeDef USART_InitStructure;
+	GPIO_InitTypeDef GPIO_InitStructure;
+
+	// USARTx setup
+	USART_InitStructure.USART_BaudRate = 600;
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+	USART_InitStructure.USART_Parity = USART_Parity_No;
+	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+
+	USART_Init(USART3, &USART_InitStructure);
+
+	// USARTx TX pin setup
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	// USARTx RX pin setup
+
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+	// Enable USARTx
+
+	USART_Cmd(USART3, ENABLE);
+
     return 0;
 }
 
@@ -449,73 +504,83 @@ int SPI_Configuration(void)
 
 int SPI2_Configuration(void)
 {
-	SPI_InitTypeDef SPI_InitStructure;
-	GPIO_InitTypeDef GPIO_InitStructure;
-
-	SPI_I2S_DeInit(SPIy);
-
-	// SPIy Mode setup
-	//SPI_InitStructure.SPI_Direction = SPI_Direction_1Line_Tx;
-	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-	//SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;	 //
-	SPI_InitStructure.SPI_CPOL = SPI_CPOL_High; //
-	//SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge; //
-	//SPI_InitStructure.SPI_NSS = SPI_NSS_Hard;
-	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-	SPI_InitStructure.SPI_BaudRatePrescaler = SPIy_PRESCALER;
-	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
-	SPI_InitStructure.SPI_CRCPolynomial = 7;
-
-	SPI_Init(SPIy, &SPI_InitStructure);
-
-	// SPIy SCK and MOSI pin setup
-	GPIO_InitStructure.GPIO_Pin = SPIy_SCK | SPIy_MOSI;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-	GPIO_Init(SPIy_GPIO, &GPIO_InitStructure);
-
-	// SPIy MISO pin setup
-	GPIO_InitStructure.GPIO_Pin = SPIy_MISO;
-	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IPU;
-
-	GPIO_Init(SPIy_GPIO, &GPIO_InitStructure);
-
-	// SPIy CS pin setup
-	GPIO_InitStructure.GPIO_Pin = SPIy_CS;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-	GPIO_Init(SPIy_CS_GPIO, &GPIO_InitStructure);
-
-	// Disable SPIy SS Output
-	SPI_SSOutputCmd(SPIy, DISABLE);
-
-	// Enable SPIy
-	SPI_Cmd(SPIy, ENABLE);
-
-	// Set CS high
-	GPIO_SetBits(SPIy_CS_GPIO, SPIy_CS);
+//	SPI_InitTypeDef SPI_InitStructure;
+//	GPIO_InitTypeDef GPIO_InitStructure;
+//
+//	//SPI_I2S_DeInit(SPIy);
+//	SPI_I2S_DeInit(SI_SPI);
+//
+//	// SPIy Mode setup
+//	//SPI_InitStructure.SPI_Direction = SPI_Direction_1Line_Tx;
+//	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+//	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+//	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+//	SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;	 //
+//	//SPI_InitStructure.SPI_CPOL = SPI_CPOL_High; //
+//	SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
+//	//SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge; //
+//	//SPI_InitStructure.SPI_NSS = SPI_NSS_Hard;
+//	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+//	//SPI_InitStructure.SPI_BaudRatePrescaler = SPIy_PRESCALER;
+//	SPI_InitStructure.SPI_BaudRatePrescaler = SI_BautRatePrescaler;
+//	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+//	SPI_InitStructure.SPI_CRCPolynomial = 7;
+//
+//	SPI_Init(SI_SPI, &SPI_InitStructure);
+//
+//	// SPIy SCK and MOSI pin setup
+//	//GPIO_InitStructure.GPIO_Pin = SPIy_SCK | SPIy_MOSI;
+//	GPIO_InitStructure.GPIO_Pin = SI_SCK | SI_MOSI;
+//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//
+//	GPIO_Init(SI_GPIO, &GPIO_InitStructure);
+//
+//	// SPIy MISO pin setup
+//	//GPIO_InitStructure.GPIO_Pin = SPIy_MISO;
+//	GPIO_InitStructure.GPIO_Pin = SI_MISO;
+//	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+//	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IPU;
+//
+//	//GPIO_Init(SPIy_GPIO, &GPIO_InitStructure);
+//	GPIO_Init(SI_GPIO, &GPIO_InitStructure);
+//
+//	// SPIy CS pin setup
+//	//GPIO_InitStructure.GPIO_Pin = SPIy_CS;
+//	GPIO_InitStructure.GPIO_Pin = SI_CS;
+//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//
+//	//GPIO_Init(SPIy_CS_GPIO, &GPIO_InitStructure);
+//	GPIO_Init(SI_GPIO, &GPIO_InitStructure);
+//
+//	// Disable SPIy SS Output
+//	//SPI_SSOutputCmd(SPIy, DISABLE);
+//	//SPI_SSOutputCmd(SI_SPI, DISABLE);
+//
+//	// Enable SPIy
+//	//SPI_Cmd(SPIy, ENABLE);
+//	SPI_Cmd(SI_SPI, ENABLE);
+//
+//	// Set CS high
+//	//GPIO_SetBits(SPIy_CS_GPIO, SPIy_CS);
+//	GPIO_SetBits(SI_GPIO, SI_CS);
 
 	// LCD_RS pin setup
-	GPIO_InitStructure.GPIO_Pin = LCD_RS;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//	GPIO_InitStructure.GPIO_Pin = LCD_RS;
+//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//
+//	GPIO_Init(SPIy_GPIO, &GPIO_InitStructure);
+//
+//	// LCD_RW pin setup
+//	GPIO_InitStructure.GPIO_Pin = LCD_RW;
+//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//
+//	GPIO_Init(SPIy_GPIO, &GPIO_InitStructure);
 
-	GPIO_Init(SPIy_GPIO, &GPIO_InitStructure);
-
-	// LCD_RW pin setup
-	GPIO_InitStructure.GPIO_Pin = LCD_RW;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-	GPIO_Init(SPIy_GPIO, &GPIO_InitStructure);
-
-    return 0;
+	return 0;
 }
 
 
@@ -562,22 +627,34 @@ int GPIO_Configuration(void)
 //	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 //	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 //	GPIO_Init(LED_GPIO, &GPIO_InitStructure );
-//	// Buzzer
-//	GPIO_InitStructure.GPIO_Pin =  BUZZ;
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIO_Init(BUZZ_GPIO, &GPIO_InitStructure );
-//	// vibrator
-//	GPIO_InitStructure.GPIO_Pin =  VIB;
-//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-//	GPIO_Init(VIB_GPIO, &GPIO_InitStructure );
+
+	// Buzzer
+	GPIO_InitStructure.GPIO_Pin =  BUZZ;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(BUZZ_GPIO, &GPIO_InitStructure );
+
+	// vibrator
+	GPIO_InitStructure.GPIO_Pin =  VIB;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(VIB_GPIO, &GPIO_InitStructure );
+
+	GPIO_ResetBits( VIB_GPIO, VIB);
+	GPIO_ResetBits( BUZZ_GPIO, BUZZ);
+
 
 	// dw power on
 			GPIO_InitStructure.GPIO_Pin =  DW_PWR | ALERT_LED | BAT_LOW_LED | BAT_ADC_SW;
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 			GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 			GPIO_Init(DW_GPIO, &GPIO_InitStructure );
+
+	// si sdn pin
+//			GPIO_InitStructure.GPIO_Pin =  SI_SDN;
+//			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+//			GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//			GPIO_Init(SI_GPIO, &GPIO_InitStructure );
 
 #else
 	//Enable GPIO used for User button
@@ -883,6 +960,8 @@ void spi_peripheral_init()
 {
 	spi_init();
 
+	SPI2_Configuration();
+
 #ifdef SAFETY_VEST
 	//SI_IntConfig(); // configure Si4463 device interface
 
@@ -990,57 +1069,57 @@ void SI_IntConfig()
 #undef SPIy_MISO
 #undef SPIy_MOSI
 
-	SPI_InitTypeDef SPI_InitStructure;
-	GPIO_InitTypeDef GPIO_InitStructure;
-
-	SPI_I2S_DeInit(SI_SPI);
-
-	// SI_SPI Mode setup
-	//SPI_InitStructure.SPI_Direction = SPI_Direction_1Line_Tx;
-	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-	//SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;	 //
-	SPI_InitStructure.SPI_CPOL = SPI_CPOL_High; //
-	//SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge; //
-	//SPI_InitStructure.SPI_NSS = SPI_NSS_Hard;
-	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-	SPI_InitStructure.SPI_BaudRatePrescaler = SI_BautRatePrescaler;
-	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
-	SPI_InitStructure.SPI_CRCPolynomial = 7;
-
-	SPI_Init(SI_SPI, &SPI_InitStructure);
-
-	// SI_SPI SCK and MOSI pin setup
-	GPIO_InitStructure.GPIO_Pin = SI_SCK | SI_MOSI;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-	GPIO_Init(SI_GPIO, &GPIO_InitStructure);
-
-	// SI_SPI MISO pin setup
-	GPIO_InitStructure.GPIO_Pin = SI_MISO;
-	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IPU;
-
-	GPIO_Init(SI_GPIO, &GPIO_InitStructure);
-
-	// SI_SPI CS pin setup
-	GPIO_InitStructure.GPIO_Pin = SI_CS;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-	GPIO_Init(SI_GPIO, &GPIO_InitStructure);
-
-	// Disable SI_SPI SS Output
-	SPI_SSOutputCmd(SI_SPI, DISABLE);
-
-	// Enable SI_SPI
-	SPI_Cmd(SI_SPI, ENABLE);
-
-	// Set CS high
-	GPIO_SetBits(SI_GPIO, SI_CS);
+//	SPI_InitTypeDef SPI_InitStructure;
+//	GPIO_InitTypeDef GPIO_InitStructure;
+//
+//	SPI_I2S_DeInit(SI_SPI);
+//
+//	// SI_SPI Mode setup
+//	//SPI_InitStructure.SPI_Direction = SPI_Direction_1Line_Tx;
+//	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+//	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+//	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+//	//SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;	 //
+//	SPI_InitStructure.SPI_CPOL = SPI_CPOL_High; //
+//	//SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
+//	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge; //
+//	//SPI_InitStructure.SPI_NSS = SPI_NSS_Hard;
+//	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+//	SPI_InitStructure.SPI_BaudRatePrescaler = SI_BautRatePrescaler;
+//	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+//	SPI_InitStructure.SPI_CRCPolynomial = 7;
+//
+//	SPI_Init(SI_SPI, &SPI_InitStructure);
+//
+//	// SI_SPI SCK and MOSI pin setup
+//	GPIO_InitStructure.GPIO_Pin = SI_SCK | SI_MOSI;
+//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//
+//	GPIO_Init(SI_GPIO, &GPIO_InitStructure);
+//
+//	// SI_SPI MISO pin setup
+//	GPIO_InitStructure.GPIO_Pin = SI_MISO;
+//	//GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
+//	GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IPU;
+//
+//	GPIO_Init(SI_GPIO, &GPIO_InitStructure);
+//
+//	// SI_SPI CS pin setup
+//	GPIO_InitStructure.GPIO_Pin = SI_CS;
+//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+//	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//
+//	GPIO_Init(SI_GPIO, &GPIO_InitStructure);
+//
+//	// Disable SI_SPI SS Output
+//	SPI_SSOutputCmd(SI_SPI, DISABLE);
+//
+//	// Enable SI_SPI
+//	SPI_Cmd(SI_SPI, ENABLE);
+//
+//	// Set CS high
+//	GPIO_SetBits(SI_GPIO, SI_CS);
 #endif
 }
 
@@ -1089,4 +1168,66 @@ void delay_ms(uint delay_ms)
 void generate_alert(void)
 {
 
+}
+
+void ADC_Configuration(void)
+{
+  ADC_InitTypeDef  ADC_InitStructure;
+  /* PCLK2 is the APB2 clock */
+  /* ADCCLK = PCLK2/6 = 72/6 = 12MHz*/
+  //RCC_ADCCLKConfig(RCC_PCLK2_Div6);
+
+  /* Enable ADC1 clock so that we can talk to it */
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+  /* Put everything back to power-on defaults */
+  ADC_DeInit(ADC1);
+
+  /* ADC1 Configuration ------------------------------------------------------*/
+  /* ADC1 and ADC2 operate independently */
+  ADC_InitStructure.ADC_Mode = ADC_Mode_Independent;
+  /* Disable the scan conversion so we do one at a time */
+  ADC_InitStructure.ADC_ScanConvMode = DISABLE;
+  /* Don't do contimuous conversions - do them on demand */
+  ADC_InitStructure.ADC_ContinuousConvMode = DISABLE;
+  /* Start conversin by software, not an external trigger */
+  ADC_InitStructure.ADC_ExternalTrigConv = ADC_ExternalTrigConv_None;
+  /* Conversions are 12 bit - put them in the lower 12 bits of the result */
+  ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+  /* Say how many channels would be used by the sequencer */
+  ADC_InitStructure.ADC_NbrOfChannel = 1;
+
+  /* Now do the setup */
+  ADC_Init(ADC1, &ADC_InitStructure);
+  /* Enable ADC1 */
+  ADC_Cmd(ADC1, ENABLE);
+
+  bat_adc_on();
+
+  /* Enable ADC1 reset calibaration register */
+  ADC_ResetCalibration(ADC1);
+  /* Check the end of ADC1 reset calibration register */
+  while(ADC_GetResetCalibrationStatus(ADC1));
+  /* Start ADC1 calibaration */
+  ADC_StartCalibration(ADC1);
+  /* Check the end of ADC1 calibration */
+  while(ADC_GetCalibrationStatus(ADC1));
+
+  bat_adc_off();
+
+}
+
+uint16 readADC1(uint8 channel)
+{
+   //bat_adc_on();
+
+  ADC_RegularChannelConfig(ADC1, channel, 1, ADC_SampleTime_1Cycles5);
+  // Start the conversion
+  ADC_SoftwareStartConvCmd(ADC1, ENABLE);
+  // Wait until conversion completion
+  while(ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC) == RESET);
+
+  //bat_adc_off();
+
+  // Get the conversion value
+  return ADC_GetConversionValue(ADC1);
 }
