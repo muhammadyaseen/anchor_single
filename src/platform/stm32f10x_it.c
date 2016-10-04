@@ -38,6 +38,7 @@ extern uint32_t USBD_OTG_EP1OUT_ISR_Handler (USB_OTG_CORE_HANDLE *pdev);
 #endif
 
 #endif
+
 __IO unsigned long time32_incr;
 
 /** @addtogroup STM32F10x_StdPeriph_Template
@@ -378,6 +379,7 @@ void OTG_HS_EP1_OUT_IRQHandler(void)
 #endif
 
 #endif
+
 
 /**
   * @}

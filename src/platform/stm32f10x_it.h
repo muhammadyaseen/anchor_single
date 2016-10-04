@@ -46,9 +46,12 @@ void PendSV_Handler(void);
 void SysTick_Handler(void);
 void ETH_IRQHandler(void);
 void ETH_WKUP_IRQHandler(void);
+
 // role button interrupt
 void EXTI1_IRQHandler(void);
 
+//USART interrupt handlers
+void USART3_IRQHandler(void);
 
 #ifdef __cplusplus
 }

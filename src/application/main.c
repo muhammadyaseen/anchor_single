@@ -13,11 +13,98 @@
 #include "deca_types.h"
 #include "deca_spi.h"
 #include "eeprom.h"
-
+#include "usart_queue.h"
 
 #define LOW_BAT_THRESHOLD 2350		//ADC reading at tap point, actual bat voltage is twice this value.
 
-	int instance_anchaddr = 0; //0 = 0xDECA020000000001; 1 = 0xDECA020000000002; 2 = 0xDECA020000000003
+
+//********** START USART QUEUE FUNCS ***********************//
+
+__IO USART_QueueTypedef txQueue;
+
+__IO uint8_t TxPrime = 0;
+
+
+int QueueFull( USART_QueueTypedef * q )
+{
+	return ( ((q->pWR + 1) % QUEUE_SIZE) == q->pRD );
+}
+
+int QueueEmpty( USART_QueueTypedef * q)
+{
+	return ( q->pWR == q->pRD );
+}
+
+int Enqueue( USART_QueueTypedef * q, uint8_t * data)
+{
+	if (QueueFull(q))
+		return 0;
+	else
+	{
+		q->q[q->pWR] = *data;
+		q->pWR = ( q->pWR + 1 == QUEUE_SIZE ) ? 0 : q->pWR + 1;
+	}
+
+	return 1;
+}
+
+int Dequeue( USART_QueueTypedef * q, uint8_t * data)
+{
+	if (QueueEmpty(q))
+		return 0;
+	else
+	{
+		*data = q->q[q->pRD];
+		q->pRD = ( (q->pRD + 1 ) == QUEUE_SIZE ) ? 0: q->pRD + 1;
+	}
+
+	return 1;
+}
+
+
+void USART3_IRQHandler(void)
+{
+	if ( USART_GetITStatus(USART3, USART_IT_TXE) != RESET )
+	{
+		uint8 data;
+
+		if ( Dequeue( &txQueue, &data) )
+		{
+			USART_SendData(USART3, data);
+		}
+		else
+		{
+			USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
+			TxPrime = 0;
+		}
+	}
+}
+
+int USART_Get(void)
+{
+//	uint8_t data;
+//
+//	while( ! Dequeue(&txQueue, &data) );
+//
+//	return data;
+	return 0;
+}
+
+void USART_Put(int c)
+{
+	while ( ! Enqueue(&txQueue, &c) );
+
+	if (!TxPrime)
+	{
+		TxPrime = 1;
+		USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
+	}
+
+}
+//********** END USART QUEUE FUNCS ***********************//
+
+
+int instance_anchaddr = 0; //0 = 0xDECA020000000001; 1 = 0xDECA020000000002; 2 = 0xDECA020000000003
 	//NOTE: switches TA_SW1_7 and TA_SW1_8 are used to set tag/anchor address
 
 
@@ -318,8 +405,10 @@ int main(void)
 
 			if ( l > 25 ) l = 0;
 
-			while(USART_GetFlagStatus(USART3 , USART_FLAG_TXE) == RESET) { }
-			USART_SendData(USART3, abc[l]);
+			USART_Put(abc[l]);
+
+//			while(USART_GetFlagStatus(USART3 , USART_FLAG_TXE) == RESET) { }
+//			USART_SendData(USART3, abc[l]);
 			l = l + 1;
 
 		}

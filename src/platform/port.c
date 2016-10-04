@@ -114,7 +114,6 @@ int NVIC_DisableDECAIRQ(void)
 int NVIC_Configuration(void)
 {
 
-
 	setup_RoleBtnIRQ();
 
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -154,6 +153,16 @@ int NVIC_Configuration(void)
 	//NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
 	//NVIC_Init(&NVIC_InitStructure);
+
+	/* Enable USART3 Interrupt */
+	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 10;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+
+	NVIC_Init(&NVIC_InitStructure);
+
+	//USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
 
 	return 0;
 }
