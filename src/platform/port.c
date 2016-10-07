@@ -114,7 +114,7 @@ int NVIC_DisableDECAIRQ(void)
 int NVIC_Configuration(void)
 {
 
-	setup_RoleBtnIRQ();
+	//setup_RoleBtnIRQ();
 
 	GPIO_InitTypeDef GPIO_InitStructure;
 	EXTI_InitTypeDef EXTI_InitStructure;
@@ -156,13 +156,11 @@ int NVIC_Configuration(void)
 
 	/* Enable USART3 Interrupt */
 	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 10;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
 	NVIC_Init(&NVIC_InitStructure);
-
-	//USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
 
 	return 0;
 }
@@ -391,7 +389,7 @@ int USART_Configuration(void)
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
@@ -399,15 +397,16 @@ int USART_Configuration(void)
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-	// Enable USARTx
+	// Enable USART3 and Associate RX interrupt
 
+	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
 	USART_Cmd(USART3, ENABLE);
 
-    return 0;
+	return 0;
 }
 
 void SPI_ChangeRate(uint16_t scalingfactor)

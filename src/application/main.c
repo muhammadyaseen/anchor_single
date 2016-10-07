@@ -21,9 +21,59 @@
 //********** START USART QUEUE FUNCS ***********************//
 
 __IO USART_QueueTypedef txQueue;
+__IO USART_QueueTypedef rxQueue;
 
 __IO uint8_t TxPrime = 0;
+__IO uint8_t RxOverflow = 0;
 
+void USART3_IRQHandler(void)
+{
+	if ( USART_GetITStatus(USART3, USART_IT_RXNE) != RESET )
+	{
+		uint8_t data;
+
+		data = USART_ReceiveData(USART3) & 0xFF;
+
+		if ( ! Enqueue(&rxQueue, &data) )
+			RxOverflow = 1;
+	}
+
+	if ( USART_GetITStatus(USART3, USART_IT_TXE) != RESET )
+	{
+		uint8 data;
+
+		if ( Dequeue( &txQueue, &data) )
+		{
+			USART_SendData(USART3, data);
+		}
+		else
+		{
+			USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
+			TxPrime = 0;
+		}
+	}
+}
+
+int USART_Get(void)
+{
+	uint8_t data;
+
+	while( ! Dequeue(&rxQueue, &data) );
+
+	return data;
+}
+
+void USART_Put(int c)
+{
+	while ( ! Enqueue(&txQueue, &c) );
+
+	if (!TxPrime)
+	{
+		TxPrime = 1;
+		USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
+	}
+
+}
 
 int QueueFull( USART_QueueTypedef * q )
 {
@@ -59,47 +109,6 @@ int Dequeue( USART_QueueTypedef * q, uint8_t * data)
 	}
 
 	return 1;
-}
-
-
-void USART3_IRQHandler(void)
-{
-	if ( USART_GetITStatus(USART3, USART_IT_TXE) != RESET )
-	{
-		uint8 data;
-
-		if ( Dequeue( &txQueue, &data) )
-		{
-			USART_SendData(USART3, data);
-		}
-		else
-		{
-			USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
-			TxPrime = 0;
-		}
-	}
-}
-
-int USART_Get(void)
-{
-//	uint8_t data;
-//
-//	while( ! Dequeue(&txQueue, &data) );
-//
-//	return data;
-	return 0;
-}
-
-void USART_Put(int c)
-{
-	while ( ! Enqueue(&txQueue, &c) );
-
-	if (!TxPrime)
-	{
-		TxPrime = 1;
-		USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
-	}
-
 }
 //********** END USART QUEUE FUNCS ***********************//
 
@@ -397,20 +406,24 @@ int main(void)
 //    IWDG_SetPrescaler(IWDG_Prescaler_4);
 //    IWDG_Enable();
     int l = 0;
+    uint8_t d;
 
     while(1)
     {
 		while (1)
 		{
 
-			if ( l > 25 ) l = 0;
+			//if ( l > 25 ) l = 0;
 
-			USART_Put(abc[l]);
+			//USART_Put(abc[l]);
 
 //			while(USART_GetFlagStatus(USART3 , USART_FLAG_TXE) == RESET) { }
 //			USART_SendData(USART3, abc[l]);
-			l = l + 1;
+			//l = l + 1;
 
+			USART_Put('A');
+			d = USART_Get();
+			USART_Put(d);
 		}
     	//IWDG_ReloadCounter();
 
