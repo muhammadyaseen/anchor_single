@@ -14,67 +14,88 @@
 #include "deca_spi.h"
 #include "eeprom.h"
 #include "usart_queue.h"
+#include "cmd_Set.h"
 
 #define LOW_BAT_THRESHOLD 2350		//ADC reading at tap point, actual bat voltage is twice this value.
 
 
 //********** START USART QUEUE FUNCS ***********************//
 
-__IO USART_QueueTypedef txQueue;
-__IO USART_QueueTypedef rxQueue;
+//__IO USART_QueueTypedef txQueue;
+//__IO USART_QueueTypedef rxQueue;
+//
+//__IO uint8_t TxPrime = 0;
+//__IO uint8_t RxOverflow = 0;
+//
+//
+//int USART_Get(void)
+//{
+//	uint8_t data;
+//
+//	while( ! Dequeue(&rxQueue, &data) );
+//
+//	return data;
+//}
+//
+//void USART_Put(int c)
+//{
+//	while ( ! Enqueue(&txQueue, (uint8_t *)&c) );
+//
+//	if (!TxPrime)
+//	{
+//		TxPrime = 1;
+//		USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
+//	}
+//
+//}
+//
+//void USART_Puts(char * str, int len)
+//{
+//	int idx = 0;
+//
+//	while( idx <= (len - 1) )
+//	{
+//		USART_Put( (int)( str[idx++] ) );
+//	}
+//}
 
-__IO uint8_t TxPrime = 0;
-__IO uint8_t RxOverflow = 0;
+//void USART_Gets(char * str, int len)
+//{
+//	int idx = 0;
+//
+//	while( idx < (len - 1) )
+//	{
+//		USART_Put( (int)(*str[idx++]));
+//	}
+//}
 
-
-int USART_Get(void)
-{
-	uint8_t data;
-
-	while( ! Dequeue(&rxQueue, &data) );
-
-	return data;
-}
-
-void USART_Put(int c)
-{
-	while ( ! Enqueue(&txQueue, &c) );
-
-	if (!TxPrime)
-	{
-		TxPrime = 1;
-		USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
-	}
-
-}
-
-void USART3_IRQHandler(void)
-{
-	if ( USART_GetITStatus(USART3, USART_IT_RXNE) != RESET )
-	{
-		uint8_t data;
-
-		data = USART_ReceiveData(USART3) & 0xFF;
-
-		if ( ! Enqueue(&rxQueue, &data) )
-			RxOverflow = 1;
-	}
-
-	if ( USART_GetITStatus(USART3, USART_IT_TXE) != RESET )
-	{
-		uint8 data;
-
-		if ( Dequeue( &txQueue, &data) )
-		{
-			USART_SendData(USART3, data);
-		}
-		else
-		{
-			USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
-			TxPrime = 0;
-		}
-	}
-}
+//void USART3_IRQHandler(void)
+//{
+//	if ( USART_GetITStatus(USART3, USART_IT_RXNE) != RESET )
+//	{
+//		uint8_t data;
+//
+//		data = USART_ReceiveData(USART3) & 0xFF;
+//
+//		if ( ! Enqueue(&rxQueue, (uint8_t *)&data) )
+//			RxOverflow = 1;
+//	}
+//
+//	if ( USART_GetITStatus(USART3, USART_IT_TXE) != RESET )
+//	{
+//		uint8 data;
+//
+//		if ( Dequeue( &txQueue, (uint8_t *)&data) )
+//		{
+//			USART_SendData(USART3, data);
+//		}
+//		else
+//		{
+//			USART_ITConfig(USART3, USART_IT_TXE, DISABLE);
+//			TxPrime = 0;
+//		}
+//	}
+//}
 
 
 //********** END USART QUEUE FUNCS ***********************//
@@ -373,7 +394,7 @@ int main(void)
 //    IWDG_SetPrescaler(IWDG_Prescaler_4);
 //    IWDG_Enable();
     int l = 0;
-    uint8_t d;
+    uint8_t d[6];
 
     while(1)
     {
@@ -388,9 +409,18 @@ int main(void)
 //			USART_SendData(USART3, abc[l]);
 			//l = l + 1;
 
-			USART_Put('A');
-			d = USART_Get();
-			USART_Put(d);
+			//USART_Puts("Send something of 5 chars?", 26);
+
+			USART_Gets(d, 6);
+
+			USART_Puts("You sent : ", 11);
+
+			USART_Puts(d, 6);
+
+			USART_Put('\n');
+
+			exec_command( decode_command((char *)d) );
+
 		}
     	//IWDG_ReloadCounter();
 
