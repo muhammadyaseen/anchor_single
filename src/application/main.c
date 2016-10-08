@@ -26,6 +26,28 @@ __IO USART_QueueTypedef rxQueue;
 __IO uint8_t TxPrime = 0;
 __IO uint8_t RxOverflow = 0;
 
+
+int USART_Get(void)
+{
+	uint8_t data;
+
+	while( ! Dequeue(&rxQueue, &data) );
+
+	return data;
+}
+
+void USART_Put(int c)
+{
+	while ( ! Enqueue(&txQueue, &c) );
+
+	if (!TxPrime)
+	{
+		TxPrime = 1;
+		USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
+	}
+
+}
+
 void USART3_IRQHandler(void)
 {
 	if ( USART_GetITStatus(USART3, USART_IT_RXNE) != RESET )
@@ -54,62 +76,7 @@ void USART3_IRQHandler(void)
 	}
 }
 
-int USART_Get(void)
-{
-	uint8_t data;
 
-	while( ! Dequeue(&rxQueue, &data) );
-
-	return data;
-}
-
-void USART_Put(int c)
-{
-	while ( ! Enqueue(&txQueue, &c) );
-
-	if (!TxPrime)
-	{
-		TxPrime = 1;
-		USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
-	}
-
-}
-
-int QueueFull( USART_QueueTypedef * q )
-{
-	return ( ((q->pWR + 1) % QUEUE_SIZE) == q->pRD );
-}
-
-int QueueEmpty( USART_QueueTypedef * q)
-{
-	return ( q->pWR == q->pRD );
-}
-
-int Enqueue( USART_QueueTypedef * q, uint8_t * data)
-{
-	if (QueueFull(q))
-		return 0;
-	else
-	{
-		q->q[q->pWR] = *data;
-		q->pWR = ( q->pWR + 1 == QUEUE_SIZE ) ? 0 : q->pWR + 1;
-	}
-
-	return 1;
-}
-
-int Dequeue( USART_QueueTypedef * q, uint8_t * data)
-{
-	if (QueueEmpty(q))
-		return 0;
-	else
-	{
-		*data = q->q[q->pRD];
-		q->pRD = ( (q->pRD + 1 ) == QUEUE_SIZE ) ? 0: q->pRD + 1;
-	}
-
-	return 1;
-}
 //********** END USART QUEUE FUNCS ***********************//
 
 
