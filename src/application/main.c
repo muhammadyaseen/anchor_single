@@ -401,7 +401,7 @@ int main(void)
 		while (1)
 		{
 
-			//if ( l > 25 ) l = 0;
+			//if ( l > 25 ) l = 0;sss
 
 			//USART_Put(abc[l]);
 
